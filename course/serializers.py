@@ -74,3 +74,16 @@ class CourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course
         fields = ['id', 'title', 'description', 'author', 'lessons']
+
+class GenerateQuestionsSerializer(serializers.Serializer):
+    course_id = serializers.IntegerField()
+    lesson_id = serializers.IntegerField()
+    student_interests = serializers.ListField(child=serializers.CharField())
+    lesson_topic = serializers.CharField()
+    num_questions = serializers.IntegerField(min_value=1, max_value=10, default=1)
+
+class GenerateReadingContentSerializer(serializers.Serializer):
+    course_id = serializers.IntegerField()
+    lesson_id = serializers.IntegerField()
+    student_interests = serializers.ListField(child=serializers.CharField())
+    lesson_topic = serializers.CharField()
