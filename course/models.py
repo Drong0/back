@@ -1,11 +1,12 @@
 import json
 from django.db import models
 from model_utils.managers import InheritanceManager
+from accounts.models import User
 
 class Course(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
-    author = models.CharField(max_length=255)
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

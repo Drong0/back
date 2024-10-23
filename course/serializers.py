@@ -73,7 +73,13 @@ class CourseSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Course
-        fields = ['id', 'title', 'description', 'author', 'lessons']
+        fields = ['id', 'title', 'description', 'author','lessons']
+        read_only_fields = ['author']
+
+    def create(self, validated_data):
+        user = self.context['request'].user
+        course = Course.objects.create(author=user, **validated_data)
+        return course
 
 class GenerateQuestionsSerializer(serializers.Serializer):
     course_id = serializers.IntegerField()

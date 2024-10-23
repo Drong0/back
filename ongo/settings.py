@@ -44,11 +44,12 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     'corsheaders',
     'rest_framework',
+    'rest_framework_simplejwt',
     'drf_yasg',
     'course',
     'model_utils',
+    'accounts',
 ]
-ALLOWED_HOSTS = ['*']
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -162,10 +163,12 @@ SWAGGER_SETTINGS = {
         'Bearer': {
             'type': 'apiKey',
             'name': 'Authorization',
-            'in': 'header'
+            'in': 'header',
+            'description': 'JWT Authorization header using the Bearer scheme. Example: "Bearer {token}"'
         }
     }
 }
+
 
 
 import os
@@ -173,3 +176,18 @@ import os
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+
+AUTH_USER_MODEL = 'accounts.User'
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+}
+
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+}

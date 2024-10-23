@@ -3,19 +3,23 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from .models import Course, Lesson, Question, TrueFalseQuestion, MultipleChoiceQuestion, Answer
 from .serializers import CourseSerializer, LessonSerializer, QuestionSerializer, TrueFalseQuestionSerializer, MultipleChoiceQuestionSerializer, AnswerSerializer, GenerateQuestionsSerializer, GenerateReadingContentSerializer
-from django.views.generic import TemplateView
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from django.core.exceptions import ObjectDoesNotExist
 import openai
 from django.conf import settings
+from rest_framework.generics import ListAPIView, RetrieveAPIView
+
+from accounts.permissions import IsTeacher
+from rest_framework.permissions import IsAuthenticated
+
 
 openai.api_key = settings.OPENAI_API_KEY
 
 class CourseViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
         serializer.save()
@@ -75,9 +79,6 @@ class AnswerViewSet(viewsets.ModelViewSet):
     queryset = Answer.objects.all()
     serializer_class = AnswerSerializer
     permission_classes = [permissions.AllowAny]
-
-class CreateCourseView(TemplateView):
-    template_name = 'courses/create_course.html'
 
 class GenerateQuestionsView(viewsets.ViewSet):
     @swagger_auto_schema(
@@ -207,3 +208,18 @@ class GenerateReadingContentView(viewsets.ViewSet):
                 return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class CoursesMyView(ListAPIView):
+    serializer_class = CourseSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Course.objects.filter(author=self.request.user)
+
+class CoursesByIDView(RetrieveAPIView):
+    serializer_class = CourseSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Course.objects.filter()
